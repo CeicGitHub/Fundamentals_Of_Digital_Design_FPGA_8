@@ -1,0 +1,7 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Cinvestav/Modulo8/Lab1prueba_lifo/lifo.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module simple_memory
+INFO: [VRFC 10-311] analyzing module sky130_sram_1kbyte_1rw1r_32x256_8
+INFO: [VRFC 10-311] analyzing module lifo_controller
+INFO: [VRFC 10-311] analyzing module lifo_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Cinvestav/Modulo8/Lab1prueba_lifo/lifo_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module lifo_tb

@@ -1,0 +1,7 @@
+0.7
+2020.2
+Nov  8 2024
+22:36:57
+D:/Cinvestav/Modulo8/Lab1prueba_lifo/lab1_lifo.sim/sim_1/behav/xsim/glbl.v,1724786425,verilog,,,,glbl,,,,,,,,
+D:/Cinvestav/Modulo8/Lab1prueba_lifo/lifo.v,1759301425,verilog,,D:/Cinvestav/Modulo8/Lab1prueba_lifo/lifo_tb.v,,lifo_controller;lifo_top;simple_memory;sky130_sram_1kbyte_1rw1r_32x256_8,,,,,,,,
+D:/Cinvestav/Modulo8/Lab1prueba_lifo/lifo_tb.v,1759301600,verilog,,,,lifo_tb,,,,,,,,
