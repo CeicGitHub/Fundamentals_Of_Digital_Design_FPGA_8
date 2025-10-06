@@ -1,0 +1,68 @@
+{
+  "DESIGN_NAME": "lifo_top",
+  "VERILOG_FILES": [
+    "dir::src/lifo_top.v",
+    "dir::src/lifo_controller.v"
+  ],
+  "VERILOG_FILES_BLACKBOX": [
+    "dir::verilog_bb/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+  ],
+  "EXTRA_LEFS": [
+    "dir::lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef"
+  ],
+  "EXTRA_GDS_FILES": [
+    "dir::gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds"
+  ],
+  "SYNTH_DEFINES": [
+    "USE_POWER_PINS=1"
+  ],
+  "VDD_NETS": [
+    "vccd1"
+  ],
+  "GND_NETS": [
+    "vssd1"
+  ],
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10,
+  "FP_SIZING": "absolute",
+  "DIE_AREA": "0 0 2000 2000",
+  "FP_CORE_UTIL": 25,
+  "PL_TARGET_DENSITY": 0.45,
+  "CELL_PAD": 2,
+  "RT_MIN_LAYER": "met1",
+  "RT_MAX_LAYER": "met4",
+  "CLOCK_MIN_LAYER": "met3",
+  "GRT_ALLOW_CONGESTION": 1,
+  "GRT_OVERFLOW_ITERS": 200,
+  "GRT_ADJUSTMENT": 0.3,
+  "DIODE_INSERTION_STRATEGY": 0,
+  "RUN_HEURISTIC_DIODE_INSERTION": 0,
+  "RUN_ANTENNA_CHECK": 0,
+  "FP_PDN_VOFFSET": 7,
+  "FP_PDN_HOFFSET": 7,
+  "FP_PDN_SKIPTRIM": true,
+  "FP_PDN_MACRO_HOOKS": "u_sram vccd1 vssd1 vccd1 vssd1",
+  "FP_PDN_ENABLE_MACROS_GRID": 1,
+  "RUN_LINTER": 0,
+  "QUIT_ON_TR_DRC": 0,
+  "RUN_LVS": 1,
+  "LVS_CONNECT_BY_LABEL": 1,
+  "LVS_INSERT_POWER_PINS": 1,
+  "LVS_POWER_NETS": [
+    "vccd1",
+    "VPWR"
+  ],
+  "LVS_GROUND_NETS": [
+    "vssd1",
+    "VGND"
+  ],
+  "LVS_SPICE_FILES": [
+    "$PDK_ROOT/sky130A/libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice",
+    "$PDK_ROOT/sky130A/libs.ref/sky130_sram_macros/spice/sky130_sram_1kbyte_1rw1r_32x256_8.spice"
+  ],
+  "MAGIC_DRC_USE_GDS": 0,
+  "MAGIC_INCLUDE_GDS_POINTERS": 1,
+  "VERILOG_INCLUDE_DIRS": [
+    "dir::src"
+  ]
+}
