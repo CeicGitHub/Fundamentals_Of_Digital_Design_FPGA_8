@@ -1,0 +1,204 @@
+
+`include "user_defines.v"
+
+// SPDX-FileCopyrightText: 2020 Efabless Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// User Project Wrapper - ALU 8-bit with Individual Macros
+// Lab 2: Arithmetic Logic Unit - Caravel SoC Design
+
+`default_nettype none
+
+module user_project_wrapper #(
+    parameter BITS = 32
+) (
+`ifdef USE_POWER_PINS
+    inout vdda1,	// User area 1 3.3V supply
+    inout vdda2,	// User area 2 3.3V supply
+    inout vssa1,	// User area 1 analog ground
+    inout vssa2,	// User area 2 analog ground
+    inout vccd1,	// User area 1 1.8V supply
+    inout vccd2,	// User area 2 1.8v supply
+    inout vssd1,	// User area 1 digital ground
+    inout vssd2,	// User area 2 digital ground
+`endif
+
+    // Wishbone Slave ports (WB MI A)
+    input wb_clk_i,
+    input wb_rst_i,
+    input wbs_stb_i,
+    input wbs_cyc_i,
+    input wbs_we_i,
+    input [3:0] wbs_sel_i,
+    input [31:0] wbs_dat_i,
+    input [31:0] wbs_adr_i,
+    output wbs_ack_o,
+    output [31:0] wbs_dat_o,
+
+    // Logic Analyzer Signals
+    input  [127:0] la_data_in,
+    output [127:0] la_data_out,
+    input  [127:0] la_oenb,
+
+    // IOs
+    input  [`MPRJ_IO_PADS-1:0] io_in,
+    output [`MPRJ_IO_PADS-1:0] io_out,
+    output [`MPRJ_IO_PADS-1:0] io_oeb,
+
+    // IRQ
+    output [2:0] irq
+);
+`ifndef USE_POWER_PINS
+    supply1 vdda1, vdda2, vccd1, vccd2;  // 3.3V y 1.8V
+    supply0 vssa1, vssa2, vssd1, vssd2;  // tierras
+`endif
+
+// ALU Signals from Logic Analyzer
+wire [7:0]  alu_a;
+wire [7:0]  alu_b; 
+wire [2:0]  alu_opcode;
+wire [7:0]  alu_result;
+
+// Extract ALU inputs from Logic Analyzer
+assign alu_a = la_data_in[7:0];       // A input (8 bits)
+assign alu_b = la_data_in[15:8];      // B input (8 bits)  
+assign alu_opcode = la_data_in[18:16]; // Operation selector (3 bits)
+
+// Output ALU result to Logic Analyzer
+assign la_data_out[7:0] = alu_result;
+assign la_data_out[127:8] = 120'b0;   // Unused outputs
+
+// ALU operation outputs
+wire [7:0] add_out, sub_out, mul_out, pow_out;
+wire [7:0] and_out, nand_out, or_out, xor_out;
+
+// Instantiate all ALU macros
+ alu_add add_macro (
+     .vccd1(vccd1),
+     .vssd1(vssd1),
+     .A(alu_a),
+     .B(alu_b),
+     .Y(add_out)
+ );
+
+ alu_sub sub_macro (
+     .vccd1(vccd1),
+     .vssd1(vssd1),
+     .A(alu_a),
+     .B(alu_b),
+     .Y(sub_out)
+ );
+
+ alu_mul mul_macro (
+     .vccd1(vccd1),
+     .vssd1(vssd1),
+     .A(alu_a),
+     .B(alu_b),
+     .Y(mul_out)
+ );
+
+ alu_pow pow_macro (
+     .vccd1(vccd1),
+     .vssd1(vssd1),
+     .A(alu_a),
+     .Y(pow_out)
+ );
+ 
+alu_and and_macro (
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+    .A(alu_a),
+    .B(alu_b),
+    .Y(and_out)
+);
+
+alu_nand nand_macro (
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+    .A(alu_a),
+    .B(alu_b),
+    .Y(nand_out)
+);
+
+alu_or or_macro (
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+    .A(alu_a),
+    .B(alu_b),
+    .Y(or_out)
+);
+
+alu_xor xor_macro (
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+    .A(alu_a),
+    .B(alu_b),
+    .Y(xor_out)
+);
+
+// Output multiplexer
+reg [7:0] mux_result;
+
+always @(*) begin
+    case (alu_opcode)
+        3'b000: mux_result = add_out;   // Addition
+        3'b001: mux_result = sub_out;   // Subtraction  
+        3'b010: mux_result = mul_out;   // Multiplication
+        3'b011: mux_result = pow_out;   // Power
+        3'b100: mux_result = and_out;   // AND
+        3'b101: mux_result = nand_out;  // NAND
+        3'b110: mux_result = or_out;    // OR
+        3'b111: mux_result = xor_out;   // XOR
+        default: mux_result = 8'h00;    // Default
+    endcase
+end
+
+assign alu_result = mux_result;
+
+// Unused outputs
+assign wbs_ack_o = 1'b0;
+assign wbs_dat_o = 32'b0;
+assign irq = 3'b000;
+assign io_out[37] = 1'b0;
+assign io_out[36] = 1'b0;
+assign io_out[35] = 1'b0;
+assign io_out[34] = 1'b0;
+assign io_out[33] = 1'b0;
+assign io_out[32] = 1'b0;
+assign io_out[31] = 1'b0;
+assign io_out[30] = 1'b0;
+assign io_out[7] = 1'b0;
+assign io_out[6] = 1'b0;
+assign io_out[5] = 1'b0;
+assign io_out[4] = 1'b0;
+assign io_out[3] = 1'b0;
+assign io_out[2] = 1'b0;
+assign io_out[1] = 1'b0;
+assign io_out[0] = 1'b0;
+
+assign io_oeb[37] = 1'b1;
+assign io_oeb[36] = 1'b1;
+assign io_oeb[35] = 1'b1;
+assign io_oeb[34] = 1'b1;
+assign io_oeb[33] = 1'b1;
+assign io_oeb[32] = 1'b1;
+assign io_oeb[31] = 1'b1;
+assign io_oeb[30] = 1'b1;
+assign io_oeb[7] = 1'b1;
+assign io_oeb[6] = 1'b1;
+assign io_oeb[5] = 1'b1;
+assign io_oeb[4] = 1'b1;
+assign io_oeb[3] = 1'b1;
+assign io_oeb[2] = 1'b1;
+assign io_oeb[1] = 1'b1;
+assign io_oeb[0] = 1'b1;
+
+
+endmodule
+
+`default_nettype wire
